@@ -1,0 +1,14 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}User List{% endblock %}
+
+{% block content %}
+  <h1 class="mb-4">All Users</h1>
+  <ul class="list-group">
+    {% for user in users %}
+      <li class="list-group-item">
+        <a href="{% url 'user_summary' user %}">{{ user }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

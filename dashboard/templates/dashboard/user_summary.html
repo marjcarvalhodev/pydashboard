@@ -1,0 +1,56 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Summary for {{ user_id }}{% endblock %}
+
+{% block content %}
+  <a href="{% url 'user_list' %}" class="btn btn-secondary mb-3">⬅ Back to user list</a>
+
+  <h2 class="mb-4">Summary for <strong>{{ user_id }}</strong></h2>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Game</th>
+        <th>Attempts</th>
+        <th>Total Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in summary %}
+        <tr>
+          <td>{{ entry.game }}</td>
+          <td>{{ entry.attempts }}</td>
+          <td>{{ entry.score }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <canvas id="scoreChart" height="100"></canvas>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const chartData = JSON.parse(`{{ chart_data|escapejs }}`);
+
+  const ctx = document.getElementById('scoreChart').getContext('2d');
+  const chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: chartData.labels,
+      datasets: [{
+        label: 'Total Score',
+        data: chartData.scores,
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+</script>
+{% endblock %}
