@@ -29,3 +29,4 @@ locale/**/django.mo
 .idea/
 .DS_Store
 *.swp
+db.sqlite3
