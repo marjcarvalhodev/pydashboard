@@ -4,27 +4,47 @@
   <meta charset="UTF-8">
   <title>{% block title %}Dashboard{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+      font-size: 1.2rem;
+    }
+</style>
   {% block extra_head %}{% endblock %}
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'user_list' %}">📊 Dashboard</a>
-    </div>
-  </nav>
+  {% block auth_guard %}{% endblock %}
+  {% if user.is_authenticated %}
+    <!-- ✅ Authenticated Layout -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'user_list' %}">📊 Dashboard</a>
+        <span>👤 {{ user.username }}</span>
+        <form method="post" action="{% url 'logout' %}" class="d-inline ms-2">
+          {% csrf_token %}
+          <button class="btn btn-sm btn-outline-danger">Logout</button>
+        </form>
+      </div>
+    </nav>
 
-  <main class="container">
-    {% block content %}{% endblock %}
-  </main>
+    <main class="container">
+      <main class="container py-4"></main>
+      {% block content %}{% endblock %}
+    </main>
 
-  <!-- Bootstrap + Chart.js -->
+  {% else %}
+    <!-- ❌ Unauthenticated -->
+    <main class="container text-center py-5">
+      <h2>🔒 Session Expired</h2>
+      <p>Your session has ended. Please <a href="{% url 'login' %}">log in again</a>.</p>
+    </main>
+  {% endif %}
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   {% block extra_js %}{% endblock %}
 </body>
 </html>

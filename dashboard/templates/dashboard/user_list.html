@@ -1,14 +1,42 @@
 {% extends 'dashboard/base.html' %}
 
-{% block title %}User List{% endblock %}
+{% block auth_guard %}
+  {% if not user.is_authenticated %}
+    <script>window.location.href = "{% url 'login' %}?next={{ request.path }}";</script>
+  {% endif %}
+{% endblock %}
 
 {% block content %}
-  <h1 class="mb-4">All Users</h1>
-  <ul class="list-group">
-    {% for user in users %}
-      <li class="list-group-item">
-        <a href="{% url 'user_summary' user %}">{{ user }}</a>
-      </li>
+  <h1 class="mb-4">📚 Students by School and Class</h1>
+
+  <div class="accordion" id="schoolsAccordion">
+    {% for school, classes in grouped.items %}
+      <div class="accordion-item mb-3">
+        <h2 class="accordion-header" id="heading-{{ forloop.counter }}">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse-{{ forloop.counter }}">
+            🏫 {{ school|title }}
+          </button>
+        </h2>
+        <div id="collapse-{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ forloop.counter }}" data-bs-parent="#schoolsAccordion">
+          <div class="accordion-body">
+            {% for class_id, students in classes.items %}
+              <div class="mb-3">
+                <h5>📚 Class {{ class_id }}</h5>
+                <ul class="list-group ms-3">
+                  {% for student in students %}
+                    <li class="list-group-item">
+                      <a href="{% url 'user_summary' student.external_user_id %}">
+                        👤 {{ student.student_number }} — {{ student.user.username }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
     {% endfor %}
-  </ul>
+  </div>
 {% endblock %}
+
