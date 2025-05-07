@@ -1,4 +1,5 @@
 {% extends 'dashboard/base.html' %}
+{% load i18n %}
 
 {% block auth_guard %}
   {% if not user.is_authenticated %}
@@ -7,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-  <h1 class="mb-4">📚 Students by School and Class</h1>
+  <h1 class="mb-4">{% trans "📚 Students by School and Class" %}</h1>
 
   <div class="accordion" id="schoolsAccordion">
     {% for school, classes in grouped.items %}
@@ -21,7 +22,7 @@
           <div class="accordion-body">
             {% for class_id, students in classes.items %}
               <div class="mb-3">
-                <h5>📚 Class {{ class_id }}</h5>
+                <h5>{% blocktrans %}📚 Class {{ class_id }}{% endblocktrans %}</h5>
                 <ul class="list-group ms-3">
                   {% for student in students %}
                     <li class="list-group-item">

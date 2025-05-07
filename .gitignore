@@ -30,3 +30,6 @@ locale/**/django.mo
 .DS_Store
 *.swp
 db.sqlite3
+
+# Ignore compiled translation files
+locale/**/django.mo

@@ -1,5 +1,6 @@
+{% load i18n %}
 {% block content %}
-<h1>Welcome to Kalulu Dashboard</h1>
-<p>This platform helps researchers and teachers analyze game logs from Kalulu.</p>
-<p><a href="{% url 'login' %}">Log in to get started</a></p>
+<h1>{% trans "Welcome to Kalulu Dashboard" %}</h1>
+<p>{% trans "This platform helps researchers and teachers analyze game logs from Kalulu." %}</p>
+<p><a href="{% url 'login' %}">{% trans "Log in to get started" %}</a></p>
 {% endblock %}

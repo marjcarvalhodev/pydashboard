@@ -1,4 +1,5 @@
 {% extends 'dashboard/base.html' %}
+{% load i18n %}
 
 {% block auth_guard %}
   {% if not user.is_authenticated %}
@@ -6,19 +7,21 @@
   {% endif %}
 {% endblock %}
 
-{% block title %}Summary for {{ user_id }}{% endblock %}
+{% block title %}
+  {% blocktrans %}Summary for {{ user_id }}{% endblocktrans %}
+{% endblock %}
 
 {% block content %}
   <a href="{% url 'user_list' %}" class="btn btn-secondary mb-3">⬅ Back to user list</a>
 
-  <h2 class="mb-4">Summary for <strong>{{ user_id }}</strong></h2>
+  <h2 class="mb-4">{% blocktrans %}Summary for <strong>{{ user_id }}{% endblocktrans %}</strong></h2>
 
   <table class="table table-bordered">
     <thead>
       <tr>
-        <th>Game</th>
-        <th>Attempts</th>
-        <th>Total Score</th>
+        <th>{% trans "Game" %}</th>
+        <th>{% trans "Attempts" %}</th>
+        <th>{% trans "Total Score" %}</th>
       </tr>
     </thead>
     <tbody>
