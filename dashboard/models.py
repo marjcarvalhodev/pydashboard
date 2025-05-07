@@ -1,4 +1,43 @@
+from django.contrib.auth.models import User
 from django.db import models
+
+class SchoolClass(models.Model):
+    name = models.CharField(max_length=100)
+
+class Profile(models.Model):
+    USER_TYPES = [
+        ('student', 'Student'),
+        ('teacher', 'Teacher'),
+        ('researcher', 'Researcher'),
+        ('admin', 'Admin'),
+    ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user_type = models.CharField(max_length=20, choices=USER_TYPES)
+    external_user_id = models.CharField(max_length=100, blank=True, null=True)
+    school_class = models.ForeignKey(SchoolClass, null=True, blank=True, on_delete=models.SET_NULL)
+
+    # New fields from user ID parsing
+    school_id = models.CharField(max_length=50, blank=True, null=True)
+    class_id = models.CharField(max_length=50, blank=True, null=True)
+    student_number = models.CharField(max_length=50, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.username} ({self.user_type})"
+
+    def parse_user_id(self):
+        if self.external_user_id:
+            try:
+                self.school_id, self.class_id, self.student_number = self.external_user_id.split("_", 2)
+            except ValueError:
+                pass  # Leave them as None if format is bad
+
+    def save(self, *args, **kwargs):
+        if self.user_type == "student" and self.external_user_id:
+            self.parse_user_id()
+        super().save(*args, **kwargs)
+
+
 
 class Escola(models.Model):
     name = models.CharField(max_length=100, unique=True)
