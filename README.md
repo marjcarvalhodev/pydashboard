@@ -1,6 +1,10 @@
-# Painel Interativo – Projeto Kalulu
+# 🧠 Painel Interativo – Projeto Kalulu
 
-Este projeto visa construir um painel interativo para visualização e análise dos dados gerados pelo jogo educacional Kalulu, utilizado em intervenções pedagógicas para o desenvolvimento da leitura.
+Este projeto visa construir um painel interativo para visualização e análise dos dados gerados pelo jogo educacional **Kalulu**, utilizado em intervenções pedagógicas para o desenvolvimento da leitura.
+
+O sistema foi pensado para **professores e pesquisadores** acompanharem a evolução de alunos através dos registros de jogo.
+
+---
 
 ## ✅ Pré-requisitos
 
@@ -10,6 +14,12 @@ Antes de rodar o projeto, você precisará ter instalado:
 - PostgreSQL 12+
 - Git
 - Virtualenv (opcional, mas recomendado)
+- Gettext (para suporte a traduções):  
+  ```bash
+  sudo apt install gettext
+  ```
+
+---
 
 ## 🚀 Como rodar o projeto localmente
 
@@ -43,17 +53,17 @@ Crie um banco PostgreSQL com os seguintes dados (ou ajuste conforme necessário)
 - **Host:** `localhost`
 - **Porta:** `5432`
 
-### 5. Configure as variáveis de ambiente
+### 5. Configure o banco de dados
 
-Crie um arquivo chamado `.env` na raiz do projeto com o seguinte conteúdo:
+Crie um banco PostgreSQL com os seguintes dados (ou ajuste conforme necessário):
 
-```env
-DEBUG=True
-SECRET_KEY=sua-chave-secreta-aqui
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/pydashboard
-```
+- **Nome do banco:** `pydashboard`
+- **Usuário:** `postgres`
+- **Senha:** `postgres`
+- **Host:** `localhost`
+- **Porta:** `5432`
 
-> Dica: copie de `.env.example` se houver.
+As configurações estão em `pydashboard/settings.py` e podem ser ajustadas diretamente.
 
 ### 6. Aplique as migrações
 
@@ -61,7 +71,31 @@ DATABASE_URL=postgres://postgres:postgres@localhost:5432/pydashboard
 python manage.py migrate
 ```
 
-### 7. Inicie o servidor local
+### 7. Carregue os dados dos jogos (via CSV)
+
+Coloque os arquivos `.csv` dentro da pasta `data/csv/` e então execute:
+
+```bash
+python manage.py load_logs --source=csv
+```
+
+### 8. Gere os usuários com base nos logs
+
+```bash
+python manage.py populate_users_from_logs
+```
+
+> Isso criará automaticamente usuários do tipo "student" com base nos dados dos jogos.
+
+### 9. Crie um usuário pesquisador para acessar o sistema
+
+```bash
+python manage.py create_staff_user --username=professor1 --password=abc123
+```
+
+---
+
+### 10. Inicie o servidor local
 
 ```bash
 python manage.py runserver
@@ -69,30 +103,15 @@ python manage.py runserver
 
 Acesse: [http://localhost:8000](http://localhost:8000)
 
----
-
-## 🧪 Comandos úteis
-
-Carregar os dados CSV:
-
-```bash
-python manage.py load_logs --source=csv
-```
-
-Resetar o banco de dados (apagar tudo e recriar):
-
-```bash
-bash scripts/reset_db.sh
-```
 
 ---
 
-## 📂 Estrutura esperada
+## 📊 Acessos disponíveis
 
-- `dashboard/` – App principal com os modelos, views e templates
-- `data/csv/` – Onde devem estar os arquivos `.csv` para ingestão
-- `scripts/` – Scripts auxiliares para automação
-- `.env` – Arquivo com as configurações locais
+- **Página inicial pública:** `/`
+- **Login:** `/login/`
+- **Dashboard (pesquisador):** `/dashboard/`
+- **Visualização de aluno:** `/dashboard/user/<user_id>/`
 
 ---
 
@@ -102,56 +121,36 @@ Este projeto suporta múltiplos idiomas. Atualmente disponíveis:
 - 🇺🇸 Inglês (`en`)
 - 🇧🇷 Português - Brasil (`pt-br`)
 
-### 🛠 Como adicionar ou atualizar traduções
+### Como traduzir:
 
-1. **Marque strings traduzíveis nos templates e views**
-
-Use `{% trans "texto" %}` ou `{% blocktrans %}` nos templates.
-
-2. **Instale o gettext (obrigatório)**
-
-Se estiver usando **WSL** ou **Linux**, rode:
-
-```bash
-sudo apt update
-sudo apt install gettext
-```
-
-> ⚠️ Este passo é necessário — sem o gettext, o comando `makemessages` não funciona.
-
-3. **Gere ou atualize os arquivos `.po`**
+1. Marque strings com `{% trans "texto" %}` ou `{% blocktrans %}`.
+2. Gere os arquivos `.po`:
 
 ```bash
 django-admin makemessages -l pt_BR --ignore=venv/*
 ```
 
-4. **Edite as traduções**
-
-Abra o arquivo:
-
-```
-locale/pt_BR/LC_MESSAGES/django.po
-```
-
-Preencha os campos `msgstr` com as traduções correspondentes.
-
-5. **Compile os arquivos de tradução**
+3. Edite `locale/pt_BR/LC_MESSAGES/django.po`
+4. Compile:
 
 ```bash
 django-admin compilemessages
 ```
 
-> Os arquivos compilados `.mo` são ignorados pelo versionamento — veja `.gitignore`.
+---
 
-6. **Troque o idioma em tempo de execução**
+## 📂 Estrutura esperada
 
-O dashboard inclui um seletor de idioma que muda a interface por sessão.  
-Você também pode definir manualmente em `settings.py`:
+- `dashboard/` – App principal com modelos, views, templates e comandos
+- `data/csv/` – Local dos arquivos `.csv` de entrada
+- `locale/` – Traduções
+- `scripts/` – Scripts auxiliares (ex: reset do banco)
+- `.env` – Variáveis de configuração local
 
-```python
-LANGUAGE_CODE = 'pt-br'  # ou 'en'
-```
+---
 
-## 📝 Observações
+## 📝 Observações finais
 
-Este projeto está em desenvolvimento e será futuramente implantado em ambiente de produção. Por enquanto, o foco é facilitar o uso em máquina local para testes e validação.
+- Por enquanto, **o uso via Docker não está configurado**, apesar de mencionado no relatório.  
+- O projeto está funcional via ambiente virtual Python e banco local.
+- Testado com dados reais da intervenção Kalulu.
